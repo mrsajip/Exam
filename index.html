@@ -1,1 +1,136 @@
-<h1> Hai </h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Question</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 40px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #444;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 12px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .msg {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Add Question</h1>
+    <form id="questionForm">
+      <label>Question</label>
+      <input type="text" id="question" required>
+
+      <label>Option A</label>
+      <input type="text" id="optionA" required>
+
+      <label>Option B</label>
+      <input type="text" id="optionB" required>
+
+      <label>Option C</label>
+      <input type="text" id="optionC" required>
+
+      <label>Option D</label>
+      <input type="text" id="optionD" required>
+
+      <label>Correct Answer</label>
+      <select id="correct" required>
+        <option value="">--Select--</option>
+        <option value="A">Option A</option>
+        <option value="B">Option B</option>
+        <option value="C">Option C</option>
+        <option value="D">Option D</option>
+      </select>
+
+      <button type="submit">Save Question</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3I8OYmz4pXzpP3sXh4EXqjuWm-M8-BKbKlQlhJLCGScKBphaMpfJhIDAmiDb2_cyz/exec";
+
+    document.getElementById("questionForm").addEventListener("submit", async function(e){
+      e.preventDefault();
+
+      const data = {
+        question: document.getElementById("question").value,
+        optionA: document.getElementById("optionA").value,
+        optionB: document.getElementById("optionB").value,
+        optionC: document.getElementById("optionC").value,
+        optionD: document.getElementById("optionD").value,
+        correct: document.getElementById("correct").value
+      };
+
+      document.getElementById("msg").innerText = "⏳ Saving...";
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          mode: "cors"
+        });
+
+        const text = await res.text();
+        console.log("Response:", text);
+
+        let result;
+        try { result = JSON.parse(text); } catch { result = {}; }
+
+        if (result.status === "success") {
+          document.getElementById("msg").innerText = "✅ Question Added Successfully!";
+          document.getElementById("questionForm").reset();
+        } else {
+          document.getElementById("msg").innerText = "❌ Failed: " + (result.message || text);
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        document.getElementById("msg").innerText = "❌ Network Error. Check console.";
+      }
+    });
+  </script>
+</body>
+</html>
